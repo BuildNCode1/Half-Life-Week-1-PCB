@@ -16,6 +16,21 @@
 #define CHIME_REPEAT_MS   15000UL
 #define DEBOUNCE_MS       30
 
+#define MPU_ADDR          0x68
+#define TILT_DEBUG        1
+
+#define TILT_LR_AXIS      ay
+#define TILT_LR_SIGN      1
+#define FLIP_SIGN         1
+
+#define TILT_ON_G         0.45f
+#define TILT_OFF_G        0.20f
+#define FACE_DOWN_G       0.75f
+#define FLIP_HOLD_MS      600
+
+Adafruit_SSD1306 display(128, 64, &Wire, -1);
+DHT dht(PIN_DHT, DHT11);
+
 struct Contact {
   const char* name;
   uint16_t remindAfterDays;
@@ -56,6 +71,12 @@ uint32_t lastDhtMs = 0;
 float tempC = NAN;
 float humidity = NAN;
 
+bool mpu0k = false;
+float ax = 0, ay = 0, az = 0;
+bool tiltArmed = true;
+uint32_t faceDownSinceMs = 0;
+bool flipHandled = false;
+
 void beep (int freq, int ms) {
   ledcWriteTone(PIN_BUZZER, freq);
   delay(ms);
@@ -66,6 +87,90 @@ void chime () {
   beep (880, 120); delay (40);
   beep (1175, 120); delay (40);
   beep(1568, 250);
+}
+
+bool mpuInit() {
+  Wire.beginTransmission(MPU_ADDR);
+  Wire.write(0x68);
+  Wire.write(0x00);
+  if (Wire.endTransmission() != 0) return false;
+
+  Wire.beginTransmission(MPU_ADDR);
+  Wire.write(0x1C);
+  Wire.write(0x00);
+  return Wire.endTransmission() == 0;
+}
+
+int16_t read16() {
+  uint8_t hi = Wire.read();
+  uint8_t lo = Wire.read();
+  return (int16_t)(hi << 8 | lo)
+}
+
+bool readAccel() {
+  Wire.beginTransmission(MPU_ADDR);
+  Wire.write(0x3B);
+  if(Wire.endTransmission(false) != 0) return false;
+  if (Wire.requestFrom((uint8_t)MPU_ADDR, (uint8_t)6) != 6) return false;
+  ax = read16() / 16384.0f;
+  ay = read16() / 16384.0f;
+  az = read16() / 16384.0f;
+  return true;
+}
+
+void snooze() {
+  snoozeUntilMs = millis() + SNOOZE_MS;
+  beep(660, 80);
+}
+
+void changeContact(int dir) {
+  selected = (selected + dir + NUM_CONTACTS) % NUM_CONTACTS;
+}
+
+void updateTilt() {
+  if (!mpu0k) return;
+
+  static uint32_t lastReadMs = 0;
+  if (millis() - lastReadMs < 20) return;
+  lastReadMs = millis
+  if (!readAccel()) return;
+
+#if TILT_DEBUG
+  static uint32_t lastPrintMs = 0;
+  if(millis() - lastPrintMs > 250) {
+    lastPrintMs = millis();
+    Serial.printf("ax=%.2f ay=%.2f, az=%.2f\n" ax, ay, az);
+  }
+#endif
+
+  bool faceDown = (FLIP_SIGN * az) < -FACE_DOWN_G;
+  if (faceDown) {
+    if (faceDownSinceMs == 0) faceDownSinceMs = millis();
+    if (!flipHandled && (millis() - faceDownSinceMs) > FLIP_HOLD_MS) {
+      snooze();
+      flipHandled = true;
+    }
+  } else {
+    faceDownSinceMs = 0;
+    flipHandled = false;
+  }
+  
+  if (!faceDown) {
+    float lr = TILT_LR_SIGN * TILT_LR_AXIS;
+    if (tiltArmed) {
+      if (lr > TILT_ON_G) {
+        changeContact(+1);
+        tiltArmed = false;
+        beep(2000, 15);
+      } else if (lr < -TILT_ON_G) {
+        changeContact(-1);
+        tiltArmed = false;
+        beep(2000, 15);
+      }
+    } else if (fabsf(lr) < TILT_OFF_G) {
+      tiltArmed = true;
+    }
+  }
 }
 
 uint32_t daysSince(const Contact &c) {
@@ -130,6 +235,9 @@ void setup() {
     Serial.println("OLED not found, check SDA/SCL wiring");
   }
 
+  mpu0k = mpuInit();
+  if (!mpu0k) Serial.println("MPU6050 not found at 0x68 - tilt disabled");
+
   dht.begin();
   ledcAttach(PIN_BUZZER, 2000, 8);
 
@@ -150,6 +258,8 @@ void loop() {
     snoozeUntilMs = millis() + SNOOZE_MS;
     beep (660, 80);
   }
+
+  updateTilt();
 
   readSensor();
 
