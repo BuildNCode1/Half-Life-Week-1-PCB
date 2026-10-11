@@ -21,7 +21,7 @@ Isolation is too common in today's culture. With everyone rushing to the next ta
 |---|---|
 | Seeed XIAO ESP32-C3 | Microcontroller with built-in BLE |
 | 0.96" SSD1306 OLED (I2C) | Display |
-| MPU6050 breakout | Motion sensing (PLANNED: tap/flip to snooze) |
+| MPU6050 breakout | Motion sensing |
 | DHT11 | Temperature and Humidity |
 | Passive piezo buzzer | Reminder chimes |
 | 3× Cherry MX Switches | User Input |
