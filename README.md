@@ -39,4 +39,8 @@ Isolation is too common in today's culture. With everyone rushing to the next ta
 | D6 | I2C SDA |
 | D10 | Buzzer (via 100 Ω) |
 
+
+## UPDATE
+>Just finished designing and uploading the case along with some custom keycaps!
+
 ![Render of Finished Case](images/Case.png)
