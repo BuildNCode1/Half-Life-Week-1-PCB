@@ -38,3 +38,5 @@ Isolation is too common in today's culture. With everyone rushing to the next ta
 | D5 | I2C SCL |
 | D6 | I2C SDA |
 | D10 | Buzzer (via 100 Ω) |
+
+![Render of Finished Case](images/Case.png)
