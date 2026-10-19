@@ -25,11 +25,15 @@
 
 ### 2026-10-05 – Work session
 
+Downloaded Kicad 10.0, installed the packages and libraries, worked a whole lot on making the schematic and footprint layout for the board.
+
 **1.9h**
 
 [Timelapse](https://lookout.hackclub.com/api/media/554ffd1d-4ef2-4aeb-a8f7-398b35392957/video.mp4)
 
 ### 2026-10-06 – Work session
+
+Created the first part of my .ino code for the board, added a button, fixed schematic and changed shape of board in footprint. Also uploaded some silkscreen images for my board.
 
 **1.03h**
 
@@ -37,11 +41,15 @@
 
 ### 2026-10-06 – Work session
 
+Uploaded all of the 3d models for my board and edited their positions, added a passive piezo buzzer to make some noise for notifications. Routed my board, changed the routing, RErouted my board.
+
 **1.17h**
 
 [Timelapse](https://lookout.hackclub.com/api/media/c691f5b2-082f-4253-9714-dc90463ed97a/video.mp4)
 
 ### 2026-10-09 – Work session
+
+Worked on my .ino code more, adding the 3rd key, integrating the buzzer. Then i found some good parts to order from ✨AliExpress,✨ and uploaded them to my BOM.
 
 **2.37h**
 
@@ -49,11 +57,15 @@
 
 ### 2026-10-10 – Work session
 
+Finished up my .ino code, integrating the tilt sensor into the code. Also started working on the case for the board.
+
 **2.55h**
 
 [Timelapse](https://lookout.hackclub.com/api/media/1b8f5e88-ad48-4b9a-8cbf-92bb0c6154cc/video.mp4)
 
 ### 2026-10-11 – Work session
+
+Finished working on the case for my board, adding some color and Pac-Man-like designs around it.
 
 **1.05h**
 
